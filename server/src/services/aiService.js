@@ -9,6 +9,16 @@ const __dirname = path.dirname(__filename)
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads')
 
+async function getFileBuffer(file) {
+  if (file.cloudinaryUrl) {
+    const response = await fetch(file.cloudinaryUrl)
+    if (!response.ok) throw new Error(`Failed to fetch file from Cloudinary: ${response.status}`)
+    return Buffer.from(await response.arrayBuffer())
+  }
+  const filePath = path.join(UPLOAD_DIR, file.filePath)
+  return readFile(filePath)
+}
+
 const CATEGORY_MAP = {
   '.pdf': 'Documents',
   '.png': 'Images',
@@ -321,9 +331,8 @@ export async function analyzeFile(file) {
 
   if (isImage && process.env.GEMINI_API_KEY) {
     try {
-      const filePath = path.join(UPLOAD_DIR, file.filePath)
-      const imageBuffer = await readFile(filePath)
-      console.log(`[AI] Calling Gemini Vision for: ${filePath} (${Math.round(imageBuffer.length / 1024)}KB)`)
+      const imageBuffer = await getFileBuffer(file)
+      console.log(`[AI] Calling Gemini Vision for: ${file.originalName} (${Math.round(imageBuffer.length / 1024)}KB)`)
       const visionResult = await callGeminiWithRetry(imageBuffer, file.extension)
       console.log(`[AI] Gemini result:`, visionResult)
 
@@ -357,9 +366,8 @@ export async function analyzeFile(file) {
 
   if (isPdf && process.env.GEMINI_API_KEY) {
     try {
-      const filePath = path.join(UPLOAD_DIR, file.filePath)
-      const pdfBuffer = await readFile(filePath)
-      console.log(`[AI] Calling Gemini Vision for PDF: ${filePath} (${Math.round(pdfBuffer.length / 1024)}KB)`)
+      const pdfBuffer = await getFileBuffer(file)
+      console.log(`[AI] Calling Gemini Vision for PDF: ${file.originalName} (${Math.round(pdfBuffer.length / 1024)}KB)`)
       const pdfResult = await analyzePdfWithGemini(pdfBuffer)
       console.log(`[AI] Gemini PDF result:`, pdfResult)
 
@@ -392,9 +400,12 @@ export async function analyzeFile(file) {
 
   if (isPdf) {
     try {
-      const filePath = path.join(UPLOAD_DIR, file.filePath)
-      console.log(`[AI] Extracting PDF text from: ${filePath}`)
-      const pdfText = await extractPdfText(filePath)
+      const pdfData = await getFileBuffer(file)
+      console.log(`[AI] Extracting PDF text from: ${file.originalName}`)
+      const parser = new PDFParse({ data: pdfData })
+      const result = await parser.getText()
+      await parser.destroy()
+      const pdfText = (result?.text || '').replace(/\s+/g, ' ').trim().substring(0, 2000)
 
       if (pdfText) {
         console.log(`[AI] PDF text extracted (${pdfText.length} chars)`)

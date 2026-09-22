@@ -6,6 +6,7 @@ import User from '../models/User.js'
 import Folder from '../models/Folder.js'
 import Category from '../models/Category.js'
 import { embedFile, reembedFile } from '../services/embeddingService.js'
+import { cloudinary, isCloudinaryConfigured } from '../config/cloudinary.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -80,6 +81,8 @@ export async function uploadFile(req, res, next) {
     }
 
     const ext = path.extname(req.file.originalname).toLowerCase()
+    const cloudinaryUrl = req.file.path || null
+    const cloudinaryPublicId = req.file.filename || null
 
     let file
     try {
@@ -87,6 +90,8 @@ export async function uploadFile(req, res, next) {
         userId: req.user._id,
         originalName: req.file.originalname,
         filePath: req.file.filename,
+        cloudinaryUrl,
+        cloudinaryPublicId,
         mimeType: req.file.mimetype,
         extension: ext,
         size: req.file.size,
@@ -94,8 +99,12 @@ export async function uploadFile(req, res, next) {
         categoryId
       })
     } catch (createError) {
-      const uploadedPath = path.join(UPLOAD_DIR, req.file.filename)
-      fs.unlink(uploadedPath, () => {})
+      if (cloudinaryPublicId && isCloudinaryConfigured) {
+        cloudinary.uploader.destroy(cloudinaryPublicId).catch(() => {})
+      } else {
+        const uploadedPath = path.join(UPLOAD_DIR, req.file.filename)
+        fs.unlink(uploadedPath, () => {})
+      }
       throw createError
     }
 
@@ -512,10 +521,16 @@ export async function permanentDeleteFile(req, res, next) {
       })
     }
 
-    const filePath = path.join(UPLOAD_DIR, file.filePath)
-    fs.unlink(filePath, (err) => {
-      if (err) console.error('[File] Failed to delete file from disk:', err.message)
-    })
+    if (file.cloudinaryPublicId && isCloudinaryConfigured) {
+      cloudinary.uploader.destroy(file.cloudinaryPublicId).catch((err) => {
+        console.error('[File] Failed to delete file from Cloudinary:', err.message)
+      })
+    } else {
+      const filePath = path.join(UPLOAD_DIR, file.filePath)
+      fs.unlink(filePath, (err) => {
+        if (err) console.error('[File] Failed to delete file from disk:', err.message)
+      })
+    }
 
     await File.findByIdAndDelete(file._id)
 
@@ -533,10 +548,20 @@ export async function emptyTrash(req, res, next) {
     const files = await File.find({ userId: req.user._id, isDeleted: true })
 
     for (const file of files) {
-      const filePath = path.join(UPLOAD_DIR, file.filePath)
-      fs.unlink(filePath, (err) => {
-        if (err) console.error('[File] Failed to delete file from disk:', err.message)
-      })
+      if (file.cloudinaryPublicId && isCloudinaryConfigured) {
+        cloudinary.uploader.destroy(file.cloudinaryPublicId).catch((err) => {
+          console.error('[File] Failed to delete file from Cloudinary:', err.message)
+        })
+      } else {
+    if (file.cloudinaryUrl) {
+      return res.redirect(file.cloudinaryUrl)
+    }
+
+    const filePath = path.join(UPLOAD_DIR, file.filePath)
+        fs.unlink(filePath, (err) => {
+          if (err) console.error('[File] Failed to delete file from disk:', err.message)
+        })
+      }
     }
 
     await File.deleteMany({ userId: req.user._id, isDeleted: true })

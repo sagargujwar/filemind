@@ -20,6 +20,14 @@ const fileSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    cloudinaryUrl: {
+      type: String,
+      default: null
+    },
+    cloudinaryPublicId: {
+      type: String,
+      default: null
+    },
     mimeType: {
       type: String,
       required: true

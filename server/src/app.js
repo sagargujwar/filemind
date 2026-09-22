@@ -13,13 +13,16 @@ import categoryRoutes from './routes/categoryRoutes.js'
 import aiRoutes from './routes/aiRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js'
+import { isCloudinaryConfigured } from './config/cloudinary.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const app = express()
 
-app.use('/uploads', express.static(process.env.UPLOAD_DIR || path.join(__dirname, '../uploads')))
+if (!isCloudinaryConfigured) {
+  app.use('/uploads', express.static(process.env.UPLOAD_DIR || path.join(__dirname, '../uploads')))
+}
 
 app.use(helmet({
   contentSecurityPolicy: false,

@@ -3,16 +3,18 @@ import api from '../../services/api'
 import AISuggestion from '../ai/AISuggestion'
 import { formatSize } from '../../utils/format'
 
-function FileThumbnail({ filePath }) {
+function FileThumbnail({ cloudinaryUrl, filePath }) {
   const [imgError, setImgError] = useState(false)
 
   if (imgError) {
     return <span className="file-emoji">🖼️</span>
   }
 
+  const src = cloudinaryUrl || `/uploads/${filePath}`
+
   return (
     <img
-      src={`/uploads/${filePath}`}
+      src={src}
       alt="thumbnail"
       className="file-thumbnail"
       onError={() => setImgError(true)}
@@ -20,10 +22,10 @@ function FileThumbnail({ filePath }) {
   )
 }
 
-function getFileIcon(extension, filePath) {
+function getFileIcon(extension, filePath, cloudinaryUrl) {
   const imageExts = ['.png', '.jpg', '.jpeg', '.webp']
-  if (imageExts.includes(extension) && filePath) {
-    return <FileThumbnail filePath={filePath} />
+  if (imageExts.includes(extension) && (cloudinaryUrl || filePath)) {
+    return <FileThumbnail cloudinaryUrl={cloudinaryUrl} filePath={filePath} />
   }
   const icons = {
     '.pdf': '📄',
@@ -168,7 +170,8 @@ export default function FileList({ files, categories, onRefresh }) {
     if (imageExts.includes(file.extension)) {
       setPreviewFile(file)
     } else {
-      window.open(`/uploads/${file.filePath}`, '_blank')
+      const url = file.cloudinaryUrl || `/uploads/${file.filePath}`
+      window.open(url, '_blank')
     }
   }
 
@@ -195,7 +198,7 @@ export default function FileList({ files, categories, onRefresh }) {
       <div className="file-list">
         {files.map((file) => (
           <div key={file._id} className={`file-item${analyzingIds[file._id] ? ' analyzing' : ''}`}>
-            <span className="file-icon">{getFileIcon(file.extension, file.filePath)}</span>
+            <span className="file-icon">{getFileIcon(file.extension, file.filePath, file.cloudinaryUrl)}</span>
             <div className="file-info">
               {editingId === file._id ? (
                 <div className="file-edit">
@@ -307,7 +310,7 @@ export default function FileList({ files, categories, onRefresh }) {
             </div>
             <div className="preview-body">
               <img
-                src={`/api/v1/files/${previewFile._id}/serve`}
+                src={previewFile.cloudinaryUrl || `/api/v1/files/${previewFile._id}/serve`}
                 alt={previewFile.generatedName || previewFile.originalName}
                 className="preview-image"
               />

@@ -17,6 +17,9 @@ services:
         value: 7d
       - key: CLIENT_URL
         value: https://filemind-i8zs.onrender.com
-    disk:
-      name: uploads
-      mountPath: /app/uploads
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false

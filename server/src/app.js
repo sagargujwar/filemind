@@ -59,7 +59,7 @@ app.use('/api/v1/ai', apiLimiter, aiRoutes)
 app.use('/api/v1/search', apiLimiter, searchRoutes)
 
 if (process.env.NODE_ENV === 'production') {
-  const clientDist = path.join(__dirname, '../../client/dist')
+  const clientDist = path.join(__dirname, '../client/dist')
   app.use(express.static(clientDist))
   app.get('/{*splat}', (req, res) => {
     res.sendFile(path.join(clientDist, 'index.html'))

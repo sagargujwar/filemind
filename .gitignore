@@ -1,0 +1,10 @@
+node_modules/
+.env
+dist/
+uploads/*
+!uploads/.gitkeep
+.vscode/
+.DS_Store
+server.log
+backfill-embeddings.js
+*.log

@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.gitignore
+uploads/*
+!uploads/.gitkeep
+*.log
+.env
+.env.example
+.vscode
+.DS_Store
+**/.gitkeep
+README.md
+PROJECT_SPEC.md
+AGENTS.md
+vitest.config.js
+src/__tests__

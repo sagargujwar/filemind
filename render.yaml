@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: filemind
+    runtime: image
+    image:
+      url: docker://Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CLIENT_URL
+        value: https://filemind-i8zs.onrender.com
+    disk:
+      name: uploads
+      mountPath: /app/uploads

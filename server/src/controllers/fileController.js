@@ -9,7 +9,7 @@ import { embedFile, reembedFile } from '../services/embeddingService.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const UPLOAD_DIR = path.join(__dirname, '../../uploads')
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads')
 
 export async function getDashboard(req, res, next) {
   try {

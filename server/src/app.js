@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename)
 
 const app = express()
 
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
+app.use('/uploads', express.static(process.env.UPLOAD_DIR || path.join(__dirname, '../uploads')))
 
 app.use(helmet({
   contentSecurityPolicy: false,

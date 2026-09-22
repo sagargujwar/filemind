@@ -7,7 +7,7 @@ import { analyzeImageWithGemini, analyzePdfWithGemini } from './visionService.js
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const UPLOAD_DIR = path.join(__dirname, '../../uploads')
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads')
 
 const CATEGORY_MAP = {
   '.pdf': 'Documents',

@@ -66,20 +66,22 @@ export default function SearchBar({ onSearch, onClear, searchMode, onSearchModeC
   return (
     <div className="search-bar" ref={wrapperRef}>
       <form onSubmit={handleSubmit} className="search-form">
-        <input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={handleFocus}
-          placeholder={searchMode === 'semantic' ? 'Search by meaning...' : 'Search files...'}
-          className="search-input"
-        />
-        {query && (
-          <button type="button" className="search-clear" onClick={handleClear}>
-            ×
-          </button>
-        )}
+        <div className="search-input-wrap">
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={handleFocus}
+            placeholder={searchMode === 'semantic' ? 'Search by meaning...' : 'Search files...'}
+            className="search-input"
+          />
+          {query && (
+            <button type="button" className="search-clear" onClick={handleClear}>
+              ×
+            </button>
+          )}
+        </div>
         <button
           type="button"
           className={`search-mode-toggle ${searchMode === 'semantic' ? 'active' : ''}`}

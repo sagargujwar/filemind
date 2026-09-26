@@ -7,6 +7,7 @@ body {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: #f5f7fb;
   color: #111827;
+  overflow-x: hidden;
 }
 
 .app {
@@ -164,6 +165,8 @@ button[type="submit"]:disabled {
 
 .dashboard-page {
   max-width: 960px;
+  width: 100%;
+  margin-inline: auto;
 }
 
 .storage-info {
@@ -252,6 +255,7 @@ button[type="submit"]:disabled {
 
 .file-info {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -261,6 +265,9 @@ button[type="submit"]:disabled {
   font-size: 14px;
   font-weight: 500;
   color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .file-meta {
@@ -367,6 +374,7 @@ button[type="submit"]:disabled {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .breadcrumb button {
@@ -391,6 +399,8 @@ button[type="submit"]:disabled {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 16px;
 }
 
@@ -417,11 +427,13 @@ button[type="submit"]:disabled {
 .create-form, .edit-form {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
   margin-bottom: 16px;
 }
 
 .create-form input, .edit-form input {
-  flex: 1;
+  flex: 1 1 200px;
+  min-width: 0;
   padding: 8px 12px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
@@ -527,6 +539,10 @@ button[type="submit"]:disabled {
   font-weight: 500;
   color: #111827;
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .category-clickable {
@@ -683,6 +699,8 @@ button[type="submit"]:disabled {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 16px;
 }
 
@@ -788,6 +806,7 @@ button[type="submit"]:disabled {
 .ai-actions {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
   margin-top: 16px;
 }
 
@@ -1030,6 +1049,7 @@ button[type="submit"]:disabled {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-wrap: wrap;
   padding: 12px 16px;
   border-top: 1px solid #e5e7eb;
   font-size: 13px;
@@ -1082,10 +1102,17 @@ button[type="submit"]:disabled {
   align-items: center;
 }
 
+.search-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
 .search-input {
   flex: 1;
   min-width: 0;
-  padding: 8px 12px;
+  padding: 8px 32px 8px 12px;
   border: 1px solid #d1d5db;
   border-radius: 8px 0 0 8px;
   font-size: 14px;
@@ -1103,7 +1130,9 @@ button[type="submit"]:disabled {
 
 .search-clear {
   position: absolute;
-  right: 130px;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   font-size: 18px;
@@ -1443,6 +1472,8 @@ button[type="submit"]:disabled {
 /* ===== Page Styles ===== */
 .page {
   max-width: 960px;
+  width: 100%;
+  margin-inline: auto;
 }
 
 .page-header {
@@ -1614,7 +1645,17 @@ button[type="submit"]:disabled {
   }
 
   .sidebar-header {
-    display: none;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    border-bottom: none;
+    border-right: 1px solid #f3f4f6;
+    flex-shrink: 0;
+  }
+
+  .sidebar-logo {
+    font-size: 16px;
+    white-space: nowrap;
   }
 
   .sidebar-nav {
@@ -1623,16 +1664,14 @@ button[type="submit"]:disabled {
     gap: 4px;
     overflow-x: auto;
     flex: 1;
+    align-items: center;
+    -webkit-overflow-scrolling: touch;
   }
 
   .sidebar-link {
     padding: 8px 12px;
     font-size: 13px;
     white-space: nowrap;
-  }
-
-  .sidebar-link span:not(.sidebar-icon) {
-    display: none;
   }
 
   .sidebar-icon {
@@ -1727,6 +1766,40 @@ button[type="submit"]:disabled {
   .settings-form {
     max-width: 100%;
   }
+
+  .folder-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .folder-actions,
+  .category-actions {
+    flex-wrap: wrap;
+  }
+
+  .category-item {
+    flex-wrap: wrap;
+  }
+
+  .search-results {
+    padding: 14px;
+  }
+
+  .search-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .settings-section {
+    padding: 16px;
+  }
+
+  .ai-suggestion {
+    padding: 16px;
+  }
+
+  .empty-state {
+    padding: 32px 16px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1751,5 +1824,38 @@ button[type="submit"]:disabled {
 
   .empty-trash-btn {
     margin-left: 0;
+  }
+
+  .auth-card,
+  .card {
+    padding: 28px 20px;
+  }
+
+  .app-content {
+    padding: 12px;
+  }
+
+  .create-form button,
+  .edit-form button {
+    flex: 1;
+  }
+
+  .search-bar .search-submit {
+    min-width: 64px;
+    padding: 8px 10px;
+  }
+
+  .sidebar-link {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .folder-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  }
+
+  .preview-pdf {
+    width: 88vw;
+    height: 55vh;
   }
 }

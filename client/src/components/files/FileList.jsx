@@ -3,6 +3,10 @@ import api from '../../services/api'
 import AISuggestion from '../ai/AISuggestion'
 import { formatSize } from '../../utils/format'
 
+function httpUrl(url) {
+  return url && /^https?:\/\//i.test(url) ? url : null
+}
+
 function FileThumbnail({ cloudinaryUrl, filePath }) {
   const [imgError, setImgError] = useState(false)
 
@@ -10,7 +14,7 @@ function FileThumbnail({ cloudinaryUrl, filePath }) {
     return <span className="file-emoji">🖼️</span>
   }
 
-  const src = cloudinaryUrl || `/uploads/${filePath}`
+  const src = httpUrl(cloudinaryUrl) || `/uploads/${filePath}`
 
   return (
     <img
@@ -170,7 +174,7 @@ export default function FileList({ files, categories, onRefresh }) {
     if (imageExts.includes(file.extension)) {
       setPreviewFile(file)
     } else {
-      const url = file.cloudinaryUrl || `/uploads/${file.filePath}`
+      const url = httpUrl(file.cloudinaryUrl) || `/uploads/${file.filePath}`
       window.open(url, '_blank')
     }
   }
@@ -310,7 +314,7 @@ export default function FileList({ files, categories, onRefresh }) {
             </div>
             <div className="preview-body">
               <img
-                src={previewFile.cloudinaryUrl || `/api/v1/files/${previewFile._id}/serve`}
+                src={httpUrl(previewFile.cloudinaryUrl) || `/api/v1/files/${previewFile._id}/serve`}
                 alt={previewFile.generatedName || previewFile.originalName}
                 className="preview-image"
               />

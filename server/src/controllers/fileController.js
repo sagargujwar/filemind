@@ -81,8 +81,8 @@ export async function uploadFile(req, res, next) {
     }
 
     const ext = path.extname(req.file.originalname).toLowerCase()
-    const cloudinaryUrl = req.file.path || null
-    const cloudinaryPublicId = req.file.filename || null
+    const cloudinaryUrl = isCloudinaryConfigured ? req.file.path || null : null
+    const cloudinaryPublicId = isCloudinaryConfigured ? req.file.filename || null : null
 
     let file
     try {
@@ -553,11 +553,7 @@ export async function emptyTrash(req, res, next) {
           console.error('[File] Failed to delete file from Cloudinary:', err.message)
         })
       } else {
-    if (file.cloudinaryUrl) {
-      return res.redirect(file.cloudinaryUrl)
-    }
-
-    const filePath = path.join(UPLOAD_DIR, file.filePath)
+        const filePath = path.join(UPLOAD_DIR, file.filePath)
         fs.unlink(filePath, (err) => {
           if (err) console.error('[File] Failed to delete file from disk:', err.message)
         })
@@ -587,6 +583,13 @@ export async function serveFile(req, res, next) {
         success: false,
         message: 'File not found'
       })
+    }
+
+    if (file.cloudinaryUrl && /^https?:\/\//i.test(file.cloudinaryUrl)) {
+      const url = req.query.download === 'true'
+        ? file.cloudinaryUrl.replace('/upload/', '/upload/fl_attachment/')
+        : file.cloudinaryUrl
+      return res.redirect(url)
     }
 
     const filePath = path.join(UPLOAD_DIR, file.filePath)

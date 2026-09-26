@@ -198,8 +198,6 @@ All endpoints use `/api/v1` prefix.
 | POST | `/api/v1/ai/analyze/:fileId` | Yes | Analyze single file |
 | POST | `/api/v1/ai/analyze-bulk` | Yes | Analyze multiple files |
 
-### AI
-
 ### Search
 
 | Method | Path | Auth | Description |

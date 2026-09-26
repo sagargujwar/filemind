@@ -13,16 +13,17 @@ import categoryRoutes from './routes/categoryRoutes.js'
 import aiRoutes from './routes/aiRoutes.js'
 import searchRoutes from './routes/searchRoutes.js'
 import { notFound, errorHandler } from './middleware/errorMiddleware.js'
-import { isCloudinaryConfigured } from './config/cloudinary.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const app = express()
 
-if (!isCloudinaryConfigured) {
-  app.use('/uploads', express.static(process.env.UPLOAD_DIR || path.join(__dirname, '../uploads')))
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1)
 }
+
+app.use('/uploads', express.static(process.env.UPLOAD_DIR || path.join(__dirname, '../uploads')))
 
 app.use(helmet({
   contentSecurityPolicy: false,
@@ -64,7 +65,8 @@ app.use('/api/v1/search', apiLimiter, searchRoutes)
 if (process.env.NODE_ENV === 'production') {
   const clientDist = path.join(__dirname, '../client/dist')
   app.use(express.static(clientDist))
-  app.get('/{*splat}', (req, res) => {
+  app.get('/{*splat}', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next()
     res.sendFile(path.join(clientDist, 'index.html'))
   })
 }

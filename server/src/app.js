@@ -1,4 +1,5 @@
 import express from 'express'
+import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import cors from 'cors'
@@ -63,12 +64,18 @@ app.use('/api/v1/ai', apiLimiter, aiRoutes)
 app.use('/api/v1/search', apiLimiter, searchRoutes)
 
 if (process.env.NODE_ENV === 'production') {
-  const clientDist = path.join(__dirname, '../client/dist')
-  app.use(express.static(clientDist))
-  app.get('/{*splat}', (req, res, next) => {
-    if (req.path.startsWith('/api/')) return next()
-    res.sendFile(path.join(clientDist, 'index.html'))
-  })
+  const clientDist = [
+    path.join(__dirname, '../client/dist'),
+    path.join(__dirname, '../../client/dist')
+  ].find((dir) => fs.existsSync(path.join(dir, 'index.html')))
+
+  if (clientDist) {
+    app.use(express.static(clientDist))
+    app.get('/{*splat}', (req, res, next) => {
+      if (req.path.startsWith('/api/')) return next()
+      res.sendFile(path.join(clientDist, 'index.html'))
+    })
+  }
 }
 
 app.use(notFound)
